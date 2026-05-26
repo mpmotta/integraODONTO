@@ -1,69 +1,67 @@
-# integraODONTO
+# 🦷 IntegraODONTO
 
-Sistema completo para gestão de clínicas odontológicas, desenvolvido com foco em performance, segurança e usabilidade. A aplicação utiliza uma arquitetura MVC (Model-View-Controller) nativa em PHP, dispensando o uso de frameworks externos para o back-end e garantindo fácil manutenção.
+**O sistema completo e descomplicado para a sua clínica odontológica.**
 
-## Funcionalidades
+O **IntegraODONTO** foi criado para organizar e facilitar o dia a dia de consultórios e clínicas. Com ele, você abandona as planilhas e o papel, centralizando o agendamento de pacientes, o histórico de tratamentos e o controle financeiro em um único ambiente seguro e fácil de usar.
 
-* **Gestão de Pacientes:** Cadastro completo com foto, dados pessoais, endereço, vinculação de responsável legal e histórico clínico (prontuário).
-* **Agenda de Consultas:** Controle de agendamentos por profissional, status de atendimento e gatilhos de integração com WhatsApp para confirmação com os pacientes.
-* **Prontuário Clínico:** Linha do tempo integrada com todo o histórico de consultas e tratamentos realizados pelo paciente na clínica.
-* **Módulo Financeiro:** Geração automática de lançamentos pendentes a partir da conclusão de tratamentos na agenda, controle de recebimentos e formas de pagamento.
-* **Relatórios Fiscais:** Exportação de dados de faturamento anual para visualização e Excel (XLS), cruzando CPF de declarantes e dependentes para o Imposto de Renda.
-* **Controle de Acesso (ACL):** Sistema de login hierárquico com permissões restritas por tipo de usuário (Administrador, Dentista e Recepção).
-* **Auditoria:** Registro ininterrupto de logs (IP, usuário, ação e tabela) para todas as operações sensíveis no banco de dados.
+---
 
-## Tecnologias Utilizadas
+## ✨ O que o sistema faz por você?
 
-* **Backend:** PHP 8+ (Orientação a Objetos, PDO).
-* **Frontend:** HTML5, CSS3, Bootstrap 5.3.
-* **Interatividade:** JavaScript, jQuery 3.6, chamadas assíncronas (AJAX).
-* **Banco de Dados:** MySQL / MariaDB.
-* **Segurança:** Hashes nativos de senha (`password_hash`), Proteção contra injeção de SQL (Prepared Statements), Prevenção contra ataques CSRF via tokens de sessão validados em todas as requisições.
+* 👥 **Cadastro de Pacientes:** Guarde todas as informações importantes, desde dados pessoais e de contato até a foto do paciente e informações do responsável legal.
+* 📅 **Agenda Inteligente:** Controle seus horários de forma visual. Saiba quem está agendado, quem está aguardando na recepção e envie mensagens de confirmação diretamente para o WhatsApp do paciente com um clique.
+* ⚕️ **Prontuário Digital:** Tenha a linha do tempo completa da saúde do paciente. Todo tratamento finalizado na agenda vai automaticamente para o histórico clínico.
+* 💰 **Controle Financeiro Automático:** Quando um tratamento é marcado como "Concluído" na agenda, o sistema já cria uma cobrança pendente no financeiro. Você só precisa confirmar o recebimento depois.
+* 📊 **Facilidade no Imposto de Renda:** Gere relatórios automáticos de tudo o que foi recebido no ano, já cruzando o CPF de quem pagou com o serviço realizado. Exporte para Excel ou PDF para mandar para o contador.
+* 🔒 **Histórico de Segurança:** O sistema anota silenciosamente tudo o que acontece (quem acessou, o que apagou ou alterou), garantindo total transparência e segurança para o dono da clínica.
 
-## Níveis de Acesso
+---
 
-O sistema opera com 3 níveis distintos de permissões de visualização e ação:
+## 👩‍⚕️ Perfis de Acesso (Quem vê o quê?)
 
-1. **Administrador:** Acesso irrestrito à plataforma, incluindo a criação, edição e exclusão de contas de usuário na aba de configurações.
-2. **Dentista:** Acesso à agenda, gestão de pacientes, prontuários, painel financeiro e relatórios de faturamento. Bloqueado para gestão de credenciais do sistema.
-3. **Recepção:** Acesso exclusivo à agenda (para marcações e controle de status) e ao cadastro de dados básicos e de contato dos pacientes. Bloqueado terminantemente para prontuários, finanças e relatórios.
+O IntegraODONTO entende que cada membro da equipe precisa de ferramentas diferentes. Por isso, ele divide os acessos em três perfis:
 
-## Estrutura de Diretórios
+1. 👑 **Administrador (Dono/Gestor):** Tem a chave do consultório. Acessa tudo e é o único que pode criar senhas ou excluir outros usuários (como novos dentistas ou secretárias).
+2. 🦷 **Dentista:** Focado no atendimento clínico. Tem acesso total à agenda, ficha dos pacientes, prontuários e também pode acompanhar os relatórios financeiros do seu faturamento. Não pode alterar as configurações do sistema.
+3. 👩‍💻 **Recepção:** Focada no atendimento ao público. Pode marcar e desmarcar consultas na agenda e atualizar os dados de contato do paciente. **Não tem acesso** aos prontuários clínicos (sigilo médico) e nem à parte financeira da clínica.
 
-A arquitetura respeita a segmentação de responsabilidades do padrão MVC:
+---
 
-* `/config` - Arquivos de configuração de ambiente e classe de conexão com o banco de dados.
-* `/core` - Classes base do sistema, gerenciador de rotas e verificações de segurança globais.
-* `/controllers` - Regras de negócio e intermediação entre as interações do usuário e o banco de dados.
-* `/models` - Classes de abstração e persistência direta de dados no banco.
-* `/views` - Telas de interface, fragmentos de layout (header, sidebar, footer) e assets estáticos (CSS/JS).
-* `/uploads/pacientes` - Diretório de destinação física para armazenamento das imagens de perfil.
+## 💻 Como instalar (Passo a Passo)
 
-## Instalação e Configuração
+A instalação foi desenhada para ser rápida e automatizada, montando toda a estrutura do sistema para você.
 
-A implantação do sistema é integralmente facilitada pelos scripts de automação Bash.
+**1. Prepare o ambiente**
+Coloque os 7 arquivos de instalação (`.sh`) que você baixou em uma pasta vazia no seu servidor web ou computador local (como o `htdocs` do XAMPP).
 
-1. Os 7 scripts `.sh` de instalação são transferidos para um diretório vazio no servidor web (ex: `htdocs`, `public_html` ou `/var/www/html`).
-2. Através de um terminal posicionado neste diretório, o instalador principal é executado:
+**2. Execute o instalador**
+Abra o terminal (linha de comando) dentro dessa pasta e digite o comando:
+
 ```bash
-
-```
-
-
-
 bash install.sh
 
 ```
-3. O script orquestrará a criação de toda a árvore de diretórios, a injeção dos códigos-fonte e a geração do arquivo `database.sql` na raiz do projeto.
-4. O arquivo `database.sql` é importado no gerenciador de banco de dados MySQL para a criação das tabelas estruturais.
-5. A configuração de credenciais do banco de dados (host, usuário e senha) é ajustada no arquivo `config/Database.php`, caso divirja do padrão do XAMPP/servidor local.
-6. A plataforma fica pronta para uso e o acesso ocorre via navegador, apontando para a URL do diretório raiz.
 
-## Credenciais Padrão
+*O sistema vai criar todas as pastas e arquivos necessários automaticamente, além de gerar um arquivo chamado `database.sql`.*
 
-Após a inicialização do banco de dados, o sistema disponibiliza um usuário mestre nativo para o primeiro acesso:
+**3. Prepare o Banco de Dados**
+Pegue esse arquivo `database.sql` gerado e importe no seu painel do banco de dados (MySQL/phpMyAdmin). Ele vai criar as tabelas e o seu usuário inicial.
 
-* **Usuário:** `admin`
-* **Senha:** `root`
+**4. Acesse o sistema**
+Abra o navegador e acesse a pasta do projeto. Para entrar pela primeira vez, use:
 
-```
+> **Usuário:** `admin`
+> **Senha:** `root`
+
+*(Lembre-se de trocar a senha ou criar seu usuário definitivo logo no primeiro acesso nas configurações!)*
+
+---
+
+## 🛠️ Tecnologias Utilizadas (Para os curiosos)
+
+O sistema foi construído de forma leve e direta, sem depender de ferramentas pesadas e complicadas:
+
+* **Linguagem:** PHP (Rodando nos bastidores de forma segura).
+* **Visual:** Telas amigáveis construídas com HTML, CSS e o padrão Bootstrap.
+* **Banco de Dados:** MySQL (Rápido e confiável para guardar seus dados).
+* **Segurança:** Criptografia forte para as senhas e proteção automática contra as principais tentativas de invasões e cliques falsos na internet.
