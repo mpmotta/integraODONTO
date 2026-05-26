@@ -1,7 +1,4 @@
 # integraODONTO
-Sistema de gestão de Clínicas Odontológicas
-
-# IntegraODONTO
 
 Sistema completo para gestão de clínicas odontológicas, desenvolvido com foco em performance, segurança e usabilidade. A aplicação utiliza uma arquitetura MVC (Model-View-Controller) nativa em PHP, dispensando o uso de frameworks externos para o back-end e garantindo fácil manutenção.
 
