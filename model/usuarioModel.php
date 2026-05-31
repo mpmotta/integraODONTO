@@ -21,21 +21,29 @@ class Usuario extends Conexao {
     public function setNivelAcesso($nivel_acesso) { $this->nivel_acesso = $nivel_acesso; }
 
     public function consulta() {
-        $sql = "SELECT id, nome_completo, cpf, login, nivel_acesso FROM $this->tabela WHERE deleted_at IS NULL ORDER BY nome_completo ASC";
+        $sql = "SELECT id, nome_completo, cpf, login, nivel_acesso FROM " . $this->tabela . " WHERE deleted_at IS NULL ORDER BY nome_completo ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function consultaID($id) {
+        $sql = "SELECT * FROM " . $this->tabela . " WHERE id = :id AND deleted_at IS NULL";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function consultaDentistas() {
-        $sql = "SELECT id, nome_completo FROM $this->tabela WHERE nivel_acesso = 2 AND deleted_at IS NULL ORDER BY nome_completo ASC";
+        $sql = "SELECT id, nome_completo FROM " . $this->tabela . " WHERE nivel_acesso = 2 AND deleted_at IS NULL ORDER BY nome_completo ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function logar($login, $senha) {
-        $sql = "SELECT id, nome_completo, login, senha, nivel_acesso FROM $this->tabela WHERE login = :login AND deleted_at IS NULL LIMIT 1";
+        $sql = "SELECT id, nome_completo, login, senha, nivel_acesso FROM " . $this->tabela . " WHERE login = :login AND deleted_at IS NULL LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(":login", $login, PDO::PARAM_STR);
         $stmt->execute();
@@ -49,7 +57,8 @@ class Usuario extends Conexao {
     }
 
     public function inserir(Usuario $usuario) {
-        $check = $this->conn->prepare("SELECT COUNT(id) FROM $this->tabela WHERE login = :login AND deleted_at IS NULL");
+        $sqlCheck = "SELECT COUNT(id) FROM " . $this->tabela . " WHERE login = :login AND deleted_at IS NULL";
+        $check = $this->conn->prepare($sqlCheck);
         $l = $usuario->getLogin();
         $check->bindParam(':login', $l, PDO::PARAM_STR);
         $check->execute();
@@ -57,8 +66,7 @@ class Usuario extends Conexao {
             return false;
         }
 
-        $sql = "INSERT INTO $this->tabela (nome_completo, cpf, login, text_senha, nivel_acesso) VALUES (:nome_completo, :cpf, :login, :senha, :nivel_acesso)";
-        $sql = "INSERT INTO $this->tabela (nome_completo, cpf, login, senha, nivel_acesso) VALUES (:nome_completo, :cpf, :login, :senha, :nivel_acesso)";
+        $sql = "INSERT INTO " . $this->tabela . " (nome_completo, cpf, login, senha, nivel_acesso) VALUES (:nome_completo, :cpf, :login, :senha, :nivel_acesso)";
         $stmt = $this->conn->prepare($sql);
         $senha_hash = password_hash($usuario->getSenha(), PASSWORD_DEFAULT);
         $stmt->bindParam(':nome_completo', $usuario->getNomeCompleto(), PDO::PARAM_STR);
@@ -70,8 +78,17 @@ class Usuario extends Conexao {
         return true;
     }
 
+    public function alterarSenha($id, $nova_senha) {
+        $sql = "UPDATE " . $this->tabela . " SET senha = :senha WHERE id = :id AND deleted_at IS NULL";
+        $stmt = $this->conn->prepare($sql);
+        $senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
+        $stmt->bindParam(':senha', $senha_hash, PDO::PARAM_STR);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
     public function excluir($id) {
-        $sql = "UPDATE $this->tabela SET deleted_at = NOW() WHERE id = :id";
+        $sql = "UPDATE " . $this->tabela . " SET deleted_at = NOW() WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();

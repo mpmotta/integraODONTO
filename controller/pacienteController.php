@@ -16,38 +16,15 @@ class PacienteController {
         $pacienteModel = new Paciente();
         return $pacienteModel->consultaID($id);
     }
-    public function inserir(Paciente $paciente) {
-        if (strlen($paciente->getNome()) == 0 || strlen($paciente->getCpf()) == 0 || strlen($paciente->getTelefone()) == 0) {
-            header("Location: ../view/formPaciente.php?campoVazio");
-            exit();
-        } else {
-            $pacienteModel = new Paciente();
-            $resultado = $pacienteModel->inserir($paciente);
-            if($resultado) {
-                header('Location: ../view/pacientes.php?cadastro=ok');
-            } else {
-                header('Location: ../view/formPaciente.php?erro=cpf_duplicado');
-            }
-            exit();
-        }
-    }
-    public function editar(Paciente $paciente) {
-        if (strlen($paciente->getNome()) == 0 || strlen($paciente->getCpf()) == 0 || strlen($paciente->getTelefone()) == 0) {
-            header("Location: ../view/formPaciente.php?id={$paciente->getId()}&campoVazio");
-            exit();
-        } else {
-            $pacienteModel = new Paciente();
-            $resultado = $pacienteModel->editar($paciente, $paciente->getId());
-            if($resultado) {
-                header("Location: ../view/pacientes.php?edit=ok");
-            } else {
-                header("Location: ../view/formPaciente.php?id={$paciente->getId()}&erro=cpf_duplicado");
-            }
-            exit();
-        }
-    }
     public function handleRequest() {
         if (isset($_GET['action'])) {
+            if ($_GET['action'] == 'buscarPacientesAjax') {
+                $pacienteModel = new Paciente();
+                $dados = $pacienteModel->buscarPacientesAjax($_GET['q']);
+                header('Content-Type: application/json');
+                echo json_encode($dados);
+                exit();
+            }
             if ($_GET['action'] == 'cadastrarPaciente' || $_GET['action'] == 'editarPaciente') {
                 $paciente = new Paciente();
                 if($_GET['action'] == 'editarPaciente') $paciente->setId($_POST['meuid']);
@@ -73,18 +50,29 @@ class PacienteController {
                     $extensao = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
                     $permitidos = array('jpg', 'jpeg', 'png');
                     if(in_array($extensao, $permitidos)) {
-                        $tmp_nome = md5($_FILES['foto']['name'] . date('d-m-Y-h-i-s'));
-                        $foto_path = $tmp_nome . "." . $extensao;
-                        move_uploaded_file($_FILES['foto']['tmp_name'], '../uploads/pacientes/' . $foto_path);
-                        $paciente->setFotoPath('../uploads/pacientes/' . $foto_path);
+                        $tmp_nome = md5($_FILES['foto']['name'] . date('d-m-Y-h-i-s')) . "." . $extensao;
+                        move_uploaded_file($_FILES['foto']['tmp_name'], '../uploads/pacientes/' . $tmp_nome);
+                        $paciente->setFotoPath('../uploads/pacientes/' . $tmp_nome);
                     }
                 }
 
+                $pacienteModel = new Paciente();
                 if($_GET['action'] == 'cadastrarPaciente') {
-                    $this->inserir($paciente);
+                    $resultado = $pacienteModel->inserir($paciente);
+                    if($resultado) {
+                        header('Location: ../view/pacientes.php?cadastro=ok');
+                    } else {
+                        header('Location: ../view/formPaciente.php?erro=cpf_duplicado');
+                    }
                 } else {
-                    $this->editar($paciente);
+                    $resultado = $pacienteModel->editar($paciente, $paciente->getId());
+                    if($resultado) {
+                        header("Location: ../view/pacientes.php?edit=ok");
+                    } else {
+                        header("Location: ../view/formPaciente.php?id={$paciente->getId()}&erro=cpf_duplicado");
+                    }
                 }
+                exit();
             }
             if ($_GET['action'] == 'excluirPaciente') {
                 $pacienteModel = new Paciente();

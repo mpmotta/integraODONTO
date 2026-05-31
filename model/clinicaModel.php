@@ -20,22 +20,22 @@ class Clinica extends Conexao {
     public function setTelefone($telefone) { $this->telefone = $telefone; }
 
     public function carregar() {
-        $sql = "SELECT * FROM $this->tabela LIMIT 1";
+        $sql = "SELECT * FROM " . $this->tabela . " LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function salvar(Clinica $clinica) {
-        $sqlCheck = "SELECT count(id) as total FROM $this->tabela";
+        $sqlCheck = "SELECT COUNT(id) as total FROM " . $this->tabela;
         $stmtCheck = $this->conn->prepare($sqlCheck);
         $stmtCheck->execute();
         $row = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
         if ($row['total'] > 0) {
-            $sql = "UPDATE $this->tabela SET nome = :nome, tipo_documento = :tipo_documento, documento = :documento, endereco = :endereco, telefone = :telefone";
+            $sql = "UPDATE " . $this->tabela . " SET nome = :nome, tipo_documento = :tipo_documento, documento = :documento, endereco = :endereco, telefone = :telefone";
         } else {
-            $sql = "INSERT INTO $this->tabela (nome, tipo_documento, documento, endereco, telefone) VALUES (:nome, :tipo_documento, :documento, :endereco, :telefone)";
+            $sql = "INSERT INTO " . $this->tabela . " (nome, tipo_documento, documento, endereco, telefone) VALUES (:nome, :tipo_documento, :documento, :endereco, :telefone)";
         }
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':nome', $clinica->getNome(), PDO::PARAM_STR);

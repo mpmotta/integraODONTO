@@ -7,16 +7,32 @@ $controller = new FinanceiroController();
 $relatorio = $controller->listarIR($ano);
 $total = 0;
 ?>
-<div class="d-flex justify-content-between align-items-center mb-3">
+<style>
+@media print {
+    body * { visibility: hidden; }
+    #area-impressao, #area-impressao * { visibility: visible; }
+    #area-impressao { position: absolute; left: 0; top: 0; width: 100%; }
+    .sidebar, .topbar, .no-print { display: none !important; }
+    .main-content { margin-left: 0 !important; padding: 0 !important; }
+}
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
     <h2>Relatório Imposto de Renda</h2>
-    <form method="GET" class="d-flex">
-        <input type="number" name="ano" class="form-control me-2" value="<?php echo $ano; ?>" placeholder="Ano">
-        <button type="submit" class="btn btn-primary">Filtrar</button>
-    </form>
+    <div class="d-flex gap-2">
+        <form method="GET" class="d-flex me-3">
+            <input type="number" name="ano" class="form-control me-2" value="<?php echo $ano; ?>" placeholder="Ano">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </form>
+        <button onclick="exportarExcel()" class="btn btn-success"><i class="fas fa-file-excel"></i> XLS</button>
+        <button onclick="window.print()" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
+    </div>
 </div>
-<div class="card shadow-sm">
+
+<div class="card shadow-sm" id="area-impressao">
     <div class="card-body">
-        <table class="table table-bordered table-hover">
+        <h4 class="mb-4 d-none d-print-block">Relatório Imposto de Renda - <?php echo $ano; ?></h4>
+        <table class="table table-bordered table-hover" id="tabelaIR">
             <thead class="table-dark"><tr><th>Data Pgto</th><th>Paciente</th><th>CPF Declarado</th><th>Tratamento</th><th>Valor</th></tr></thead>
             <tbody>
                 <?php foreach ($relatorio as $r): 
@@ -41,4 +57,17 @@ $total = 0;
         </table>
     </div>
 </div>
+
+<script>
+function exportarExcel() {
+    var tabela = document.getElementById("tabelaIR").outerHTML;
+    var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>' + tabela + '</body></html>';
+    var blob = new Blob([html], {type: 'application/vnd.ms-excel'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Relatorio_IR_<?php echo $ano; ?>.xls';
+    a.click();
+}
+</script>
 <?php require_once 'footer.php'; ?>

@@ -22,7 +22,7 @@ $pacientes = $controller->consultar();
                     <td>
                         <a href="prontuario.php?id_paciente=<?php echo $p['id']; ?>" class="btn btn-sm btn-success">Prontuário</a>
                         <a href="formPaciente.php?id=<?php echo $p['id']; ?>" class="btn btn-sm btn-primary">Editar</a>
-                        <a href="../controller/pacienteController.php?action=excluirPaciente&id=<?php echo $p['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Excluir?');">Excluir</a>
+                        <a href="../controller/pacienteController.php?action=excluirPaciente&id=<?php echo $p['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este paciente?');">Excluir</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

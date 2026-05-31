@@ -4,7 +4,7 @@ date_default_timezone_set('America/Sao_Paulo');
 abstract class Conexao {
     private $servidor = 'localhost';
     private $user = 'root';
-    private $pass = '';
+    private $pass = 'apple';
     private $banco = 'integra_odonto';
     protected $conn;
 

@@ -47,22 +47,32 @@ class Paciente extends Conexao {
     public function setFotoPath($foto_path) { $this->foto_path = $foto_path; }
 
     public function consulta() {
-        $sql = "SELECT id, nome, cpf, telefone, email FROM $this->tabela WHERE deleted_at IS NULL ORDER BY nome ASC";
+        $sql = "SELECT id, nome, cpf, telefone, email FROM " . $this->tabela . " WHERE deleted_at IS NULL ORDER BY nome ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function consultaID($id) {
-        $sql = "SELECT * FROM $this->tabela WHERE id = :id AND deleted_at IS NULL";
+        $sql = "SELECT * FROM " . $this->tabela . " WHERE id = :id AND deleted_at IS NULL";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function buscarPacientesAjax($query) {
+        $sql = "SELECT id, nome, cpf FROM " . $this->tabela . " WHERE (nome LIKE :q OR cpf LIKE :q) AND deleted_at IS NULL ORDER BY nome ASC LIMIT 10";
+        $stmt = $this->conn->prepare($sql);
+        $param = "%" . $query . "%";
+        $stmt->bindParam(':q', $param, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function inserir(Paciente $paciente) {
-        $check = $this->conn->prepare("SELECT COUNT(id) FROM $this->tabela WHERE cpf = :cpf AND deleted_at IS NULL");
+        $sqlCheck = "SELECT COUNT(id) FROM " . $this->tabela . " WHERE cpf = :cpf AND deleted_at IS NULL";
+        $check = $this->conn->prepare($sqlCheck);
         $c = $paciente->getCpf();
         $check->bindParam(':cpf', $c, PDO::PARAM_STR);
         $check->execute();
@@ -70,7 +80,7 @@ class Paciente extends Conexao {
             return false;
         }
 
-        $sql = "INSERT INTO $this->tabela (nome, data_nascimento, sexo, rg, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, responsavel_nome, responsavel_cpf, foto_path) 
+        $sql = "INSERT INTO " . $this->tabela . " (nome, data_nascimento, sexo, rg, cpf, email, telefone, cep, logradouro, numero, complemento, bairro, cidade, uf, responsavel_nome, responsavel_cpf, foto_path) 
                 VALUES (:nome, :data_nascimento, :sexo, :rg, :cpf, :email, :telefone, :cep, :logradouro, :numero, :complemento, :bairro, :cidade, :uf, :responsavel_nome, :responsavel_cpf, :foto_path)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':nome', $paciente->getNome(), PDO::PARAM_STR);
@@ -95,7 +105,8 @@ class Paciente extends Conexao {
     }
 
     public function editar(Paciente $paciente, $id) {
-        $check = $this->conn->prepare("SELECT COUNT(id) FROM $this->tabela WHERE cpf = :cpf AND id != :id AND deleted_at IS NULL");
+        $sqlCheck = "SELECT COUNT(id) FROM " . $this->tabela . " WHERE cpf = :cpf AND id != :id AND deleted_at IS NULL";
+        $check = $this->conn->prepare($sqlCheck);
         $c = $paciente->getCpf();
         $check->bindParam(':cpf', $c, PDO::PARAM_STR);
         $check->bindParam(':id', $id, PDO::PARAM_INT);
@@ -104,9 +115,10 @@ class Paciente extends Conexao {
             return false;
         }
 
-        $sql = "UPDATE $this->tabela SET nome=:nome, data_nascimento=:data_nascimento, sexo=:sexo, rg=:rg, cpf=:cpf, email=:email, telefone=:telefone, cep=:cep, logradouro=:logradouro, numero=:numero, complemento=:complemento, bairro=:bairro, cidade=:cidade, uf=:uf, responsavel_nome=:responsavel_nome, responsavel_cpf=:responsavel_cpf";
+        $sql = "UPDATE " . $this->tabela . " SET nome=:nome, data_nascimento=:data_nascimento, sexo=:sexo, rg=:rg, cpf=:cpf, email=:email, telefone=:telefone, cep=:cep, logradouro=:logradouro, numero=:numero, complemento=:complemento, bairro=:bairro, cidade=:cidade, uf=:uf, responsavel_nome=:responsavel_nome, responsavel_cpf=:responsavel_cpf";
         if ($paciente->getFotoPath() != null) {
-            $getOld = $this->conn->prepare("SELECT foto_path FROM $this->tabela WHERE id = :id");
+            $sqlGetOld = "SELECT foto_path FROM " . $this->tabela . " WHERE id = :id";
+            $getOld = $this->conn->prepare($sqlGetOld);
             $getOld->bindParam(':id', $id, PDO::PARAM_INT);
             $getOld->execute();
             $oldPath = $getOld->fetchColumn();
@@ -141,7 +153,7 @@ class Paciente extends Conexao {
     }
 
     public function excluir($id) {
-        $sql = "UPDATE $this->tabela SET deleted_at = NOW() WHERE id = :id";
+        $sql = "UPDATE " . $this->tabela . " SET deleted_at = NOW() WHERE id = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();

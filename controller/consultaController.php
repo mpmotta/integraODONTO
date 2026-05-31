@@ -12,22 +12,66 @@ class ConsultaController {
         $model = new Consulta();
         return $model->listarAgenda();
     }
+    public function consultaID($id) {
+        $model = new Consulta();
+        return $model->consultaID($id);
+    }
     public function listarProntuario($id_paciente) {
         $model = new Consulta();
         return $model->listarProntuario($id_paciente);
     }
+    public function listarFotos($id_consulta) {
+        $model = new Consulta();
+        return $model->listarFotosTratamento($id_consulta);
+    }
     public function handleRequest() {
         if (isset($_GET['action'])) {
-            if ($_GET['action'] == 'agendar') {
+            if ($_GET['action'] == 'gerarJsonCalendario') {
+                $model = new Consulta();
+                $dados = $model->listarTodasConsultasCalendario();
+                $eventos = [];
+                foreach($dados as $d) {
+                    $inicio = $d['data_consulta'] . 'T' . $d['hora_consulta'];
+                    $eventos[] = [
+                        'id' => $d['id'],
+                        'title' => $d['paciente'] . ' - ' . $d['nome_tratamento'],
+                        'start' => $inicio
+                    ];
+                }
+                header('Content-Type: application/json');
+                echo json_encode($eventos);
+                exit();
+            }
+            if ($_GET['action'] == 'uploadFoto') {
+                if (isset($_FILES['foto_tratamento']) && $_FILES['foto_tratamento']['error'] == 0) {
+                    $extensao = strtolower(pathinfo($_FILES['foto_tratamento']['name'], PATHINFO_EXTENSION));
+                    if(in_array($extensao, ['jpg', 'jpeg', 'png'])) {
+                        $tmp_nome = md5($_FILES['foto_tratamento']['name'] . date('d-m-Y-h-i-s')) . '.' . $extensao;
+                        move_uploaded_file($_FILES['foto_tratamento']['tmp_name'], '../uploads/tratamentos/' . $tmp_nome);
+                        $model = new Consulta();
+                        $model->inserirFotoTratamento($_POST['id_consulta'], '../uploads/tratamentos/' . $tmp_nome);
+                    }
+                }
+                header("Location: ../view/prontuario.php?id_paciente=" . $_POST['id_paciente']);
+                exit();
+            }
+            if ($_GET['action'] == 'agendar' || $_GET['action'] == 'editarConsulta') {
                 $consulta = new Consulta();
                 $consulta->setIdPaciente($_POST['id_paciente']);
                 $consulta->setIdDentista($_POST['id_dentista']);
                 $consulta->setNomeTratamento($_POST['nome_tratamento']);
                 $consulta->setDataConsulta($_POST['data_consulta']);
                 $consulta->setHoraConsulta($_POST['hora_consulta']);
-                $consulta->setStatus('Agendado');
-                $consulta->inserir($consulta);
-                header("Location: ../view/agenda.php?sucesso=agendado");
+                
+                if ($_GET['action'] == 'editarConsulta') {
+                    $consulta->setId($_POST['meuid']);
+                    $consulta->editar($consulta);
+                    header("Location: ../view/agenda.php?sucesso=editado");
+                } else {
+                    $consulta->setStatus('Agendado');
+                    $consulta->inserir($consulta);
+                    header("Location: ../view/agenda.php?sucesso=agendado");
+                }
                 exit();
             }
             if ($_GET['action'] == 'concluir') {
